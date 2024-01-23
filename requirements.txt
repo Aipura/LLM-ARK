@@ -1,0 +1,10 @@
+transformers
+tensorboardX
+numpy
+# torch>=2.0.0
+tqdm
+datasets
+accelerate
+sentencepiece
+thefuzz
+scikit-learn
