@@ -53,7 +53,7 @@ bash scripts/train_llama2_7b_type_1.sh
 
 6. Test
 ```
-bash scripts/train_llama2_7b_type_1.sh
+bash scripts/test_llama2_7b_type_1.sh
 ```
 
 You can modify the hyperparameters yourself to perform ablation experiments.
