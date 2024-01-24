@@ -6,7 +6,7 @@ python train.py \
     --state_embed_size 4096 \
     --hidden_dim 4096 \
     --max_step_length 2 \
-    --evaluate_freq 1 \
+    --evaluate_freq 5 \
     --batch_size 4096 \
     --mini_batch_size 1024 \
     --train_batch_size 16 \

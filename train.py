@@ -1958,14 +1958,14 @@ class Trainer:
             done = False
             batch_size = s.shape[0]
             # print(batch_size)
-            all_s =  np.zeros([batch_size, self.option.max_step_length], dtype=np.int32).tolist()
-            all_a = np.zeros([batch_size, self.option.max_step_length], dtype=np.int32).tolist()
-            all_log = np.zeros([batch_size, self.option.max_step_length], dtype=np.int32).tolist()
-            all_s_ = np.zeros([batch_size, self.option.max_step_length], dtype=np.int32).tolist()
-            all_dw = np.zeros([batch_size, self.option.max_step_length], dtype=np.int32).tolist()
-            all_done = np.zeros([batch_size, self.option.max_step_length], dtype=np.int32).tolist()
-            all_ce = np.zeros([batch_size, self.option.max_step_length], dtype=np.int32).tolist()
-            process_reward = np.zeros([batch_size, self.option.max_step_length], dtype=np.int32).tolist()
+            all_s =  np.zeros([batch_size, 1], dtype=np.int32).tolist()
+            all_a = np.zeros([batch_size, 1], dtype=np.int32).tolist()
+            all_log = np.zeros([batch_size, 1], dtype=np.int32).tolist()
+            all_s_ = np.zeros([batch_size, 1], dtype=np.int32).tolist()
+            all_dw = np.zeros([batch_size, 1], dtype=np.int32).tolist()
+            all_done = np.zeros([batch_size, 1], dtype=np.int32).tolist()
+            all_ce = np.zeros([batch_size, 1], dtype=np.int32).tolist()
+            process_reward = np.zeros([batch_size, 1], dtype=np.int32).tolist()
             all_r = []
             arr_achieve = [False] * batch_size
             equal_arr=[False] * batch_size
@@ -2155,17 +2155,19 @@ class Trainer:
                         all_log[j][i] = a_log_prob[j].cpu()
                         all_s_[j][i] = s_[j].cpu()
                         all_ce[j][i] = ce[j].cpu()
-                        if i < self.option.max_step_length - 1:
-                            all_done[j][i] = False
-                            all_dw[j][i] = False
-                        else:
-                            # all_done[j][i] = True
-                            # if ne[j] == te[j]:
-                            #     all_dw[j][i] = True
-                            # else:
-                            #     all_dw[j][i] = True
-                            all_done[j][i] = True
-                            all_dw[j][i] = True
+                        all_done[j][i] = True
+                        all_dw[j][i] = True
+                        # if i < self.option.max_step_length - 1:
+                        #     all_done[j][i] = False
+                        #     all_dw[j][i] = False
+                        # else:
+                        #     # all_done[j][i] = True
+                        #     # if ne[j] == te[j]:
+                        #     #     all_dw[j][i] = True
+                        #     # else:
+                        #     #     all_dw[j][i] = True
+                        #     all_done[j][i] = True
+                        #     all_dw[j][i] = True
                             
                     # new_size = replay_buffer.get_size()
                     # pbar_buffer.update(new_size - old_size)
