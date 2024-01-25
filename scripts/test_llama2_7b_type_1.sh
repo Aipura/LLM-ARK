@@ -15,7 +15,7 @@ python train.py \
     --instruction_type 1 \
     --stater_path /root/autodl-tmp/huggingface/hub/models--NousResearch--Llama-2-7b-hf/snapshots/dacdfcde31297e34b19ee0e7532f29586d2c17bc \
     --stater_cache_dir "" \
-    --actor_checkpoint_path "" \
+    --actor_checkpoint_path "runs/LLM-ARK/TRAINASSISTANT/2024-01-24_20-01-09/actor.pkt" \
     --rl_train_data_path datasets/OpenDialKG/Reason/train_type_1.json \
     --rl_valid_data_path datasets/OpenDialKG/Reason/valid_type_1.json \
     --rl_test_data_path datasets/OpenDialKG/Reason/test_type_1.json 

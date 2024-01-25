@@ -29,15 +29,16 @@ class KnowledgeGraph:
             out = (relation, tail)
             if out not in all_out_dict[head]:
                 all_out_dict[head].append(out)
-                
-        # shuffle the data
-        # np.random.seed(self.option.seed)
-        # for head in tqdm(all_out_dict):
-        #     if len(all_out_dict[head]) <= self.option.max_out - 1:
-        #         np.random.shuffle(all_out_dict[head])
-        #     else:
-        #         all_out_dict[head] = all_out_dict[head][:self.option.max_out]
-        #         np.random.shuffle(all_out_dict[head])
+        
+        if self.option.out_path_shuffle:
+            print("shuffle the out paths of graph")
+            np.random.seed(self.option.seed)
+            for head in tqdm(all_out_dict):
+                if len(all_out_dict[head]) <= self.option.max_out - 1:
+                    np.random.shuffle(all_out_dict[head])
+                else:
+                    all_out_dict[head] = all_out_dict[head][:self.option.max_out]
+                    np.random.shuffle(all_out_dict[head])
 
         out_array = np.ones((self.option.num_entity, self.option.max_out, 2), dtype=np.int64)
         out_array[:, :, 0] *= self.data_loader.relation2num["Pad"]

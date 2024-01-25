@@ -1,5 +1,5 @@
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 from model.Data import DataLoader
 from model.Graph import KnowledgeGraph
@@ -481,7 +481,7 @@ class Manager(nn.Module):
             #     self.dw = True
             # reward = self.cal_reward(next_entity)
             self.steps += 1
-            # if self.steps >= self.option.max_step_length:
+            # if self.steps >= self.option.train_step_length:
             #     self.dones = True
             #     if next_entity == self.target_entity:
             #         self.dws = True
@@ -1156,6 +1156,7 @@ class Tester:
         
     def yield_next(self):
         data_iter = iter(DL(self.test_data, batch_size=1))
+        # c = 0
         while True:
             try:
                 batch = next(data_iter)
@@ -1164,15 +1165,31 @@ class Tester:
                 self.dialog_history = batch["dialog_history"]
                 self.query = batch["query"]
                 self.path_history = batch["path_history"]
+                self.path = batch["path"]
                 # if self.path_history:
                 #     self.path_history[0] = list(self.path_history[0])
                 self.inp = batch["input"]
+                # c += 1
+                # if c >= 100:
+                #     break
             except StopIteration:
                 break
             yield 0
 
-    def reset(self):
+    def reset(self, st: list = None):
         with torch.no_grad():
+            if st is not None:
+                self.start_entity = torch.LongTensor([st[0]])
+                self.target_entity = torch.LongTensor([st[1]])
+                if self.character == "Reason" or self.character == "User" or self.character == "Assistant":
+                    if self.option.ablation == "Context":
+                        self.context = st[2]
+                    elif self.option.ablation == "Utterance":
+                        self.utterance = st[2]
+                    elif self.option.ablation == "Proposed":
+                        pass
+                    else:
+                        raise Exception("Please check your ablation settings!")
             self.log_current_prob = self.init_log_current_prob
             # print(self.instruction)
             # print(self.path_history)
@@ -1406,7 +1423,100 @@ class Tester:
                 json.dump(action_distribution, f, ensure_ascii=True, indent=4)
             return result, all_final_reward_0 / len(self.test_data)
             
-
+#     def test_llama(self):
+#         with torch.no_grad():
+#             pbar = tqdm(total=len(self.test_data))
+#             # pbar = tqdm(total=5)
+#             data_iter = iter(DL(dataset=self.test_data, batch_size=24, shuffle=True, collate_fn=self.collate_fn))
+#             all_final_reward_1 = 0
+#             all_action_reward_1 = 0
+#             # sub_count = 200
+#             while True:
+#                 try:
+#                     batch = next(data_iter)
+#                     current_entities = batch["current_entity"]
+#                     target_entities= batch["target_entity"]
+#                     dialog_histories = batch["dialog_history"]
+#                     queries = batch["query"]
+#                     path_histories = batch["path_history"]
+#                     # if self.path_history:
+#                     #     self.path_history[0] = list(self.path_history[0])
+#                     inps = batch["input"]
+#                     # state_queries = 
+#                     done = False
+#                     mask = current_entities.eq(target_entities)
+#                     if self.option.use_cuda:
+#                         current_entities = current_entities
+#                         target_entities = target_entities
+                        
+#                     a_prob = self.tracker.update_state(
+#                         dialog_history=dialog_histories,
+#                         query=queries,
+#                         path_history=path_histories,
+#                         current_entity=current_entities,
+#                         step=1,
+#                         inp=inps
+#                         # current_entities=current_entities
+#                     )
+#                     # plm, _ = self.agent.actor(state_queries)
+#                     # a_prob = self.manager.tracker.stater(state_queries)
+#                     action = torch.argmax(a_prob, dim=1)
+#                     # max_step_length = 1
+#                     # print(action)
+#                     # print(current_entities)
+#                     # print(actions)
+#                     # print("\n")
+#                     # all_action_reward_1 += action.eq(actions).long().sum().item()
+#                     next_relations, next_entities = self.graph.get_nexts(current_entities, action)
+#                     # print(next_entities)
+#                     # print(target_entities)
+#                     reward = next_entities.eq(target_entities)
+#                     print(f"{i}: {reward.long().sum().item()}")
+#                     # print(reward)
+#                     reward[mask] = True
+#                     mask = reward
+#                     current_entities_arr = []
+#                     next_entities_arr = []
+#                     for i in range(len(next_entities)):
+#                         # print(self.current_entities[i])
+#                         # print(chosen_relations[i])
+#                         # print(chosen_entities[i])
+#                         # print(chosen_entities[i].item())
+#                         # print(self.data_loader.num2entity[chosen_entities[i].item()])
+#                         current_entity_str = self.data_loader.num2entity[current_entities[i].item()]
+#                         next_relation_str = self.data_loader.num2relation[next_relations[i].item()]
+#                         next_entity_str = self.data_loader.num2entity[next_entities[i].item()]
+                        
+#                         if len(path_histories) != 0:
+#                             if not isinstance(path_histories[i], list):
+#                                 path_histories[i] = list(path_histories[i])
+#                             path_histories[i].append(f"{current_entity_str},{next_relation_str},{next_entity_str}")
+#                         else:
+#                             path_histories.append([f"{current_entity_str},{next_relation_str},{next_entity_str}"])
+#                         next_entities_arr.append(next_entity_str)
+#                         current_entities_arr.append(current_entity_str)
+#                     # print(path_histories)
+#                     # print(current_entities_arr)
+#                     # print(next_entities_arr)
+#                     # print(next_paths)
+#                     # state_queries = self.tracker.update_state(
+#                     #     instruction=instructions,
+#                     #     dialog_history=dialog_histories,
+#                     #     query=queries,
+#                     #     path_history=path_histories,
+#                     #     current_entity=next_entities_arr,
+#                     # )
+#                     # current_entities = next_entities
+#                     final_reward_1 = mask.long().sum().item()
+#                     all_final_reward_1 += final_reward_1
+#                     pbar.update(24)
+#                     # sub_count -= 40
+#                 except StopIteration:
+#                     break
+#             result = all_final_reward_1 / len(self.test_data)
+#             resilt_action = all_action_reward_1 / len(self.test_data)
+#             return result, resilt_action
+            
     def test(self):
         with torch.no_grad():
             all_path_recall_1 = 0
@@ -1580,28 +1690,32 @@ class Tester:
                                 break
                             else:
                                 all_r_rank += 1.0 / (pos + 1)
-                        # for pos, p in enumerate(all_paths):
-                        #     # print(p)
-                        #     # print(p[:path_len])
-                        #     # print(self.path)
-                        #     if p[:1] == self.path:
-                        #         # print("find path")
-                        #         if pos < 25:
-                        #             # print("25+")
-                        #             all_path_recall_25 += 1
-                        #             if pos < 10:
-                        #                 # print("10+")
-                        #                 all_path_recall_10 += 1
-                        #                 if pos < 5:
-                        #                     # print("5+")
-                        #                     all_path_recall_5 += 1
-                        #                     if pos < 3:
-                        #                         # print("3+")
-                        #                         all_path_recall_3 += 1
-                        #                         if pos < 1:
-                        #                             # print("1+")
-                        #                             all_path_recall_1 += 1
-                        #         break
+                        for pos, p in enumerate(all_paths):
+                            # print(p)
+                            # print(self.path)
+                            # print(p[:2] == self.path)
+                            # print("\n")
+                            # print("\n")
+                            # print("\n")
+                            # print("\n")
+                            if p[:2] == self.path:
+                                # print("find path")
+                                if pos < 25:
+                                    # print("25+")
+                                    all_path_recall_25 += 1
+                                    if pos < 10:
+                                        # print("10+")
+                                        all_path_recall_10 += 1
+                                        if pos < 5:
+                                            # print("5+")
+                                            all_path_recall_5 += 1
+                                            if pos < 3:
+                                                # print("3+")
+                                                all_path_recall_3 += 1
+                                                if pos < 1:
+                                                    # print("1+")
+                                                    all_path_recall_1 += 1
+                                break
                     else:
                         if self.character == "Target":
                             for pos, p in enumerate(all_paths):
@@ -1830,10 +1944,10 @@ class Tester:
         return c_reward, s_reward
 
     def step(self, action_logit, current_entities):
+        actions_entities = self.graph.get_out(current_entities.view(-1).cpu())
+        out_relations_id = actions_entities[:, :, 0]
+        out_entities_id = actions_entities[:, :, 1]
         if self.option.out_path_aware:
-            actions_entities = self.graph.get_out(current_entities.view(-1).cpu())
-            out_relations_id = actions_entities[:, :, 0]
-            out_entities_id = actions_entities[:, :, 1]
             out_entities_embedding = self.entity_embedding(out_entities_id)
             out_relations_embedding = self.relation_embedding(out_relations_id)
             path_embedding = torch.cat([out_relations_embedding, out_entities_embedding], -1)
@@ -1903,9 +2017,8 @@ from model.replaybuffer import ReplayBuffer
 # from test import Tester
 from tqdm import tqdm
 
+
 # from tricks.normalization import Normalization
-
-
 class Trainer:
     def __init__(self, option, manager, agent, character):
         self.option = option
@@ -1915,7 +2028,7 @@ class Trainer:
 
     def train(self):
         np.random.seed(self.option.seed)
-        self.option.max_episode_steps = self.option.max_step_length  # Maximum number of steps per episode
+        self.option.max_episode_steps = self.option.train_step_length  # Maximum number of steps per episode
         evaluate_num = 0  # Record the number of evaluations
         total_steps = 0  # Record the total steps during the training
         replay_buffer = ReplayBuffer(self.option, self.option.state_embed_size)
@@ -1958,22 +2071,21 @@ class Trainer:
             done = False
             batch_size = s.shape[0]
             # print(batch_size)
-            all_s =  np.zeros([batch_size, 1], dtype=np.int32).tolist()
-            all_a = np.zeros([batch_size, 1], dtype=np.int32).tolist()
-            all_log = np.zeros([batch_size, 1], dtype=np.int32).tolist()
-            all_s_ = np.zeros([batch_size, 1], dtype=np.int32).tolist()
-            all_dw = np.zeros([batch_size, 1], dtype=np.int32).tolist()
-            all_done = np.zeros([batch_size, 1], dtype=np.int32).tolist()
-            all_ce = np.zeros([batch_size, 1], dtype=np.int32).tolist()
-            process_reward = np.zeros([batch_size, 1], dtype=np.int32).tolist()
+            all_s =  np.zeros([batch_size, self.option.train_step_length], dtype=np.int32).tolist()
+            all_a = np.zeros([batch_size, self.option.train_step_length], dtype=np.int32).tolist()
+            all_log = np.zeros([batch_size, self.option.train_step_length], dtype=np.int32).tolist()
+            all_s_ = np.zeros([batch_size, self.option.train_step_length], dtype=np.int32).tolist()
+            all_dw = np.zeros([batch_size, self.option.train_step_length], dtype=np.int32).tolist()
+            all_done = np.zeros([batch_size, self.option.train_step_length], dtype=np.int32).tolist()
+            all_ce = np.zeros([batch_size, self.option.train_step_length], dtype=np.int32).tolist()
+            process_reward = np.zeros([batch_size, self.option.train_step_length], dtype=np.int32).tolist()
             all_r = []
             arr_achieve = [False] * batch_size
             equal_arr=[False] * batch_size
             old_size = replay_buffer.get_size()
             # print(all_a)
             with torch.no_grad():
-                # set max_step_length = 1 for training
-                for i in range(1):
+                for i in range(self.option.train_step_length):
                     episode_steps += 1
                     mask = None
                     # if i == 1:
@@ -2155,19 +2267,17 @@ class Trainer:
                         all_log[j][i] = a_log_prob[j].cpu()
                         all_s_[j][i] = s_[j].cpu()
                         all_ce[j][i] = ce[j].cpu()
-                        all_done[j][i] = True
-                        all_dw[j][i] = True
-                        # if i < self.option.max_step_length - 1:
-                        #     all_done[j][i] = False
-                        #     all_dw[j][i] = False
-                        # else:
-                        #     # all_done[j][i] = True
-                        #     # if ne[j] == te[j]:
-                        #     #     all_dw[j][i] = True
-                        #     # else:
-                        #     #     all_dw[j][i] = True
-                        #     all_done[j][i] = True
-                        #     all_dw[j][i] = True
+                        if i < self.option.train_step_length - 1:
+                            all_done[j][i] = False
+                            all_dw[j][i] = False
+                        else:
+                            # all_done[j][i] = True
+                            # if ne[j] == te[j]:
+                            #     all_dw[j][i] = True
+                            # else:
+                            #     all_dw[j][i] = True
+                            all_done[j][i] = True
+                            all_dw[j][i] = True
                             
                     # new_size = replay_buffer.get_size()
                     # pbar_buffer.update(new_size - old_size)
@@ -2180,7 +2290,7 @@ class Trainer:
                 final_reward = final_rewards[i]
                 temp = [final_reward]
                 # all_r[i].append(final_reward)
-                for _ in range(self.option.max_step_length - 1):
+                for _ in range(self.option.train_step_length - 1):
                     final_reward = final_reward * self.option.gamma
                     temp.insert(0, final_reward)
                 all_r.append(temp)
@@ -2212,6 +2322,19 @@ class Trainer:
                         append_able = False
                         break
                     
+            # zhugeliang_state_query = self.manager.zhugeliang()
+            # if zhugeliang_state_query is not None:
+            #     if replay_buffer.get_size() < self.option.batch_size:
+            #         replay_buffer.store(
+            #             all_s[-1],
+            #             all_a[-1],
+            #             all_log[-1],
+            #             1,
+            #             zhugeliang_state_query.squeeze().cpu(),
+            #             True,
+            #             True,
+            #             all_ce[-1]
+            #         )
             # When the number of transitions in buffer reaches batch_size,then update
             # print(replay_buffer.get_size())
             if replay_buffer.get_size() >= self.option.batch_size:
@@ -2242,17 +2365,17 @@ class Trainer:
                 # Evaluate the policy every 'evaluate_freq' steps
                 if train_times % self.option.evaluate_freq == 0:
                     evaluate_num += 1
-                    tester = Tester(self.option, self.manager, self.agent, self.character)
+                    # tester = Tester(self.option, self.manager, self.agent, self.character)
                     all_final_reward_1, all_final_reward_0 = tester.test_once()
                     tester = None
                     # 清空GPU缓存
                     torch.cuda.empty_cache()
-                    self.option.writer.add_scalar('valid/step_rewards_0{}'.format(self.option.exp_name), all_final_reward_0, evaluate_num)
+                    # self.option.writer.add_scalar('valid/step_rewards_0{}'.format(self.option.exp_name), all_final_reward_0, evaluate_num)
                     self.option.writer.add_scalar('valid/step_rewards_1{}'.format(self.option.exp_name), all_final_reward_1, evaluate_num)
-                    if all_final_reward_0 > max_reward:
+                    if all_final_reward_1 > max_reward:
                         impatience = 0
                         # print("saving models...")
-                        max_reward = all_final_reward_0
+                        max_reward = all_final_reward_1
                         self.agent.save()
                         # self.manager.save()
                     else:
@@ -2260,7 +2383,7 @@ class Trainer:
                         if impatience >= self.option.max_patience:
                             print(f"No patience! Final reward:\t{max_reward}")
                             return max_reward
-                    pbar.set_postfix(impatience=impatience, times=evaluate_num, m_reward=max_reward, reward_1=all_final_reward_1, reward_0=all_final_reward_0)
+                    pbar.set_postfix(impatience=impatience, times=evaluate_num, m_reward=max_reward, reward=all_final_reward_1)
 
 if __name__ == '__main__':
     import datetime
@@ -2284,6 +2407,7 @@ if __name__ == '__main__':
     parser.add_argument('--character', default="Assistant", type=str, help="Target / MultiHop / Assistant / User / Reason")
     parser.add_argument('--use_trans_e', type=bool, default=True)
     parser.add_argument('--out_path_aware', type=bool, default=True)
+    parser.add_argument('--out_path_shuffle', type=bool, default=True)
     parser.add_argument('--max_patience', default=10, type=int)
     parser.add_argument('--state_embed_size', default=4096, type=int)
     parser.add_argument("--use_bias", type=bool, default=False, help="whether to use bias for actor")
@@ -2293,7 +2417,8 @@ if __name__ == '__main__':
     parser.add_argument('--relation_embed_size', default=200, type=int)
     parser.add_argument('--entity_embed_size', default=200, type=int)
     parser.add_argument('--max_out', default=50, type=int)
-    parser.add_argument('--max_step_length', default=1, type=int)
+    parser.add_argument('--train_step_length', default=1, type=int)
+    parser.add_argument('--max_step_length', default=2, type=int)
     parser.add_argument('--seed', default=3407, type=int)
     parser.add_argument('--train_times', default=8, type=int)
     parser.add_argument('--test_times', default=20, type=int)
