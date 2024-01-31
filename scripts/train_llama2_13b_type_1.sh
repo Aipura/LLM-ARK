@@ -18,5 +18,7 @@ python train.py \
     --stater_path /root/autodl-tmp/huggingface/hub/models--NousResearch--Llama-2-13b-hf/snapshots/b0491461253755d8c60bf22f0d696b9e337c6375 \
     --stater_cache_dir "" \
     --actor_checkpoint_path "" \
-    --rl_train_data_path datasets/OpenDialKG/Reason/train_type_1.json
+    --rl_train_data_path datasets/OpenDialKG/Reason/train_type_1.json \
+    --rl_valid_data_path datasets/OpenDialKG/Reason/valid_type_1.json \
+    --rl_test_data_path datasets/OpenDialKG/Reason/test_type_1.json
     
