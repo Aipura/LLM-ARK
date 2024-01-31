@@ -7,17 +7,16 @@ python train.py \
     --hidden_dim 5120 \
     --max_step_length 2 \
     --train_step_length 1 \
+    --max_patience 5 \
     --evaluate_freq 5 \
     --batch_size 4096 \
     --mini_batch_size 1024 \
-    --train_batch_size 4 \
-    --test_batch_size 48 \
+    --train_batch_size 2 \
+    --test_batch_size 32 \
     --stater_type llama \
     --instruction_type 1 \
     --stater_path /root/autodl-tmp/huggingface/hub/models--NousResearch--Llama-2-13b-hf/snapshots/b0491461253755d8c60bf22f0d696b9e337c6375 \
     --stater_cache_dir "" \
     --actor_checkpoint_path "" \
-    --rl_train_data_path datasets/OpenDialKG/Reason/train_type_1.json \
-    --rl_valid_data_path datasets/OpenDialKG/Reason/valid_type_1.json \
-    --rl_test_data_path datasets/OpenDialKG/Reason/test_type_1.json 
+    --rl_train_data_path datasets/OpenDialKG/Reason/train_type_1.json
     

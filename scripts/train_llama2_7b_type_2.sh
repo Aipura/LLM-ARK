@@ -1,17 +1,23 @@
 python train.py \
-    --mode test \
+    --mode train \
     --use_trans_e True \
     --out_path_aware True \
+    --out_path_shuffle True \
     --bf16 True \
     --state_embed_size 4096 \
     --hidden_dim 4096 \
     --max_step_length 2 \
+    --train_step_length 1 \
+    --max_patience 5 \
+    --evaluate_freq 5 \
     --batch_size 4096 \
+    --mini_batch_size 1024 \
+    --train_batch_size 16 \
     --test_batch_size 128 \
     --stater_type llama \
-    --instruction_type 1 \
+    --instruction_type 2 \
     --stater_path /root/autodl-tmp/huggingface/hub/models--NousResearch--Llama-2-7b-hf/snapshots/dacdfcde31297e34b19ee0e7532f29586d2c17bc \
     --stater_cache_dir "" \
     --actor_checkpoint_path "" \
-    --rl_test_data_path datasets/OpenDialKG/Reason/test_type_1.json 
+    --rl_train_data_path datasets/OpenDialKG/Reason/train_type_2.json
     

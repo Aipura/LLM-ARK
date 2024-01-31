@@ -279,7 +279,7 @@ class Manager(nn.Module):
         self.dones = torch.tensor([False] * 2)
         self.dws = torch.tensor([False] * 2)
         self.steps = 0
-        print(len(self.train_data))
+        print(f"num train data {len(self.train_data)}")
         self.data_iter = iter(DL(dataset=self.train_data, batch_size=self.option.train_batch_size, shuffle=True, collate_fn=self.collate_fn))
         # self.load()
         self.device = torch.device("cuda") if self.option.use_cuda else torch.device("cpu")
@@ -1026,10 +1026,12 @@ class Tester:
         self.graph = manager.graph
         if self.option.mode == "train":
             self.test_data = self.data_loader.get_reason_valid_data()
+            self.num_test_data = len(self.test_data)
+            print(f"num valid data {self.num_test_data}")
         else:
             self.test_data = self.data_loader.get_reason_test_data()
-        self.num_test_data = len(self.test_data)
-        print(self.num_test_data)
+            self.num_test_data = len(self.test_data)
+            print(f"num test data {self.num_test_data}")   
         self.tracker = manager.tracker
         self.relation_embedding = agent.actor.relation_embedding
         self.entity_embedding = agent.actor.entity_embedding
@@ -2049,10 +2051,10 @@ class Trainer:
         # state_norm = Normalization(shape=self.option.state_embed_size)  # Trick 2:state normalization
         if update_times > 0:
             pbar.update(update_times)
-        max_reward = all_final_reward_0
+        max_reward = all_final_reward_1
         impatience = 0
         pbar.set_postfix(impatience=impatience, times=evaluate_num, m_reward=max_reward,
-                         reward_1=all_final_reward_1, reward_0=all_final_reward_0)
+                         reward=all_final_reward_1)
         pbar_buffer = tqdm(total=self.option.batch_size)
         samples_per_explore_per_agent = self.option.train_times * 2
         sample_inds = 0
@@ -2367,7 +2369,7 @@ class Trainer:
                     evaluate_num += 1
                     # tester = Tester(self.option, self.manager, self.agent, self.character)
                     all_final_reward_1, all_final_reward_0 = tester.test_once()
-                    tester = None
+                    # tester = None
                     # 清空GPU缓存
                     torch.cuda.empty_cache()
                     # self.option.writer.add_scalar('valid/step_rewards_0{}'.format(self.option.exp_name), all_final_reward_0, evaluate_num)
@@ -2405,14 +2407,14 @@ if __name__ == '__main__':
     parser.add_argument('--mode', default="train", type=str)
     parser.add_argument('--model', default="checkpoint", type=str)
     parser.add_argument('--character', default="Assistant", type=str, help="Target / MultiHop / Assistant / User / Reason")
-    parser.add_argument('--use_trans_e', type=bool, default=True)
-    parser.add_argument('--out_path_aware', type=bool, default=True)
-    parser.add_argument('--out_path_shuffle', type=bool, default=True)
+    parser.add_argument('--use_trans_e', type=bool, default=False)
+    parser.add_argument('--out_path_aware', type=bool, default=False)
+    parser.add_argument('--out_path_shuffle', type=bool, default=False)
     parser.add_argument('--max_patience', default=10, type=int)
     parser.add_argument('--state_embed_size', default=4096, type=int)
     parser.add_argument("--use_bias", type=bool, default=False, help="whether to use bias for actor")
     parser.add_argument("--fp16", type=bool, default=False, help="whether to use fp16")
-    parser.add_argument("--bf16", type=bool, default=True, help="whether to use bf16")
+    parser.add_argument("--bf16", type=bool, default=False, help="whether to use bf16")
     parser.add_argument("--hidden_dim", type=int, default=4096, help="The number of neurons in hidden layers of the neural network")
     parser.add_argument('--relation_embed_size', default=200, type=int)
     parser.add_argument('--entity_embed_size', default=200, type=int)
@@ -2509,5 +2511,5 @@ if __name__ == '__main__':
         trainer.train()
 
     if option.mode == "test":
-        tester.test_once()
+        # tester.test_once()
         tester.test()

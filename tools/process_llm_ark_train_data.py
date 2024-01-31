@@ -19,6 +19,7 @@ sys.path.append(grandfather_dir)
 from model.utils import check_dir
 from model.Data import DataLoader
 from model.Graph import KnowledgeGraph
+from pprint import pprint
 
 parser = argparse.ArgumentParser("Hyperparameter Setting for LLM-ARK")
 parser.add_argument('--exp_name', default="LLM-ARK", type=str)
@@ -348,11 +349,16 @@ rl_valid_dataset = rl_test_val_dataset[:len_test_dataset]
 
 rl_test_dataset = rl_test_val_dataset[len_test_dataset:]
 
+pprint(rl_train_dataset[0])
+
+print(f"saving train data at {option.rl_train_data_path}")
 with open(option.rl_train_data_path, "w", encoding="utf8") as f:
     json.dump(rl_train_dataset, f, indent=4, ensure_ascii=False)
-
+    
+print(f"saving valid data at {option.rl_valid_data_path}")
 with open(option.rl_valid_data_path, "w", encoding="utf8") as f:
     json.dump(rl_valid_dataset, f, indent=4, ensure_ascii=False)
     
+print(f"saving test data at {option.rl_test_data_path}")   
 with open(option.rl_test_data_path, "w", encoding="utf8") as f:
     json.dump(rl_test_dataset, f, indent=4, ensure_ascii=False)
