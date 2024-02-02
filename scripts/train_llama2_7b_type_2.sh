@@ -12,13 +12,13 @@ python train.py \
     --evaluate_freq 5 \
     --batch_size 4096 \
     --mini_batch_size 1024 \
-    --train_batch_size 16 \
+    --train_batch_size 12 \
     --test_batch_size 128 \
     --stater_type llama \
     --instruction_type 2 \
     --stater_path /root/autodl-tmp/huggingface/hub/models--NousResearch--Llama-2-7b-hf/snapshots/dacdfcde31297e34b19ee0e7532f29586d2c17bc \
     --stater_cache_dir "" \
-    --actor_checkpoint_path "" \
+    --actor_checkpoint_path "runs/LLM-ARK/TRAINASSISTANT/2024-01-31_11-28-20/actor.pkt" \
     --rl_train_data_path datasets/OpenDialKG/Reason/train_type_2.json \
     --rl_valid_data_path datasets/OpenDialKG/Reason/valid_type_2.json \
     --rl_test_data_path datasets/OpenDialKG/Reason/test_type_2.json

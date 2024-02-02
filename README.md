@@ -59,8 +59,8 @@ bash scripts/test_llama2_7b_type_1.sh
 You can modify the hyperparameters yourself to perform ablation experiments.
 
 ## Datasets and Checkpoints
-- [OneDrive](https://1drv.ms/u/s!Ag89Dbur-oW3bDjK2vT1a7zPW_4?e=KiNzYx)
-- [BaiduNetdisk](https://pan.baidu.com/s/1BcrPTQBK4-mgPgJwsZi2Sw?pwd=hn8z)
+- [OneDrive](https://1drv.ms/u/s!Ag89Dbur-oW3fHOM1FpqixT_syI?e=xtX9Ah)
+- [BaiduNetdisk](https://pan.baidu.com/s/1IeRWtf88WyL4T9kdtzjjdA?pwd=wdds)
 
 The data and checkpoints in the netdisk are produced by executing steps 2, 3, and 4 of the Usage section. Putting them directly into the project root directory may save you a lot of time!
 
