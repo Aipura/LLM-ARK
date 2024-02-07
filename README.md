@@ -1,9 +1,9 @@
 # LLM-ARK
 This repository provide an implementation of LLM-ARK, which is described in this paper:
 
-[LLM-ARK: Knowledge Graph Reasoning Using Large Language Models via Deep Reinforcement Learning](https://arxiv.org/abs/2312.11282)
+[Evaluating and Enhancing Large Language Models for Conversational Reasoning on Knowledge Graphs](https://arxiv.org/abs/2312.11282)
 
-Yuxuan Huang
+Yuxuan Huang, Lida Shi, Anqi Liu, Hao Xu
 
 #### Motivating example:
 
@@ -68,10 +68,10 @@ The data and checkpoints in the netdisk are produced by executing steps 2, 3, an
 ## Reference
 To cite this work please use:
 ```
-@misc{huang2023llmark,
-      title={LLM-ARK: Knowledge Graph Reasoning Using Large Language Models via Deep Reinforcement Learning}, 
-      author={Yuxuan Huang},
-      year={2023},
+@misc{huang2024evaluating,
+      title={Evaluating and Enhancing Large Language Models for Conversational Reasoning on Knowledge Graphs}, 
+      author={Yuxuan Huang and Lida Shi and Anqi Liu and Hao Xu},
+      year={2024},
       eprint={2312.11282},
       archivePrefix={arXiv},
       primaryClass={cs.CL}
@@ -79,4 +79,4 @@ To cite this work please use:
 ```
 
 ## License
-OpenDialKG is released under [Apache-2.0 license](https://www.apache.org/licenses/LICENSE-2.0), see [LICENSE](https://github.com/Aipura/LLM-ARK/blob/main/LICENSE) for details.
+LLM-ARK is released under [Apache-2.0 license](https://www.apache.org/licenses/LICENSE-2.0), see [LICENSE](https://github.com/Aipura/LLM-ARK/blob/main/LICENSE) for details.
